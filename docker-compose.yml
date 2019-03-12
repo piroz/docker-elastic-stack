@@ -1,0 +1,37 @@
+version: "2"
+services:
+
+  elasticsearch:
+    build:
+      context: ./elasticsearch
+    environment:
+      - 'cluster.name=elasticsearch'
+      - 'bootstrap.memory_lock=true'
+      - 'ES_JAVA_OPTS=-Xms1g -Xmx1g -verbose:gc'
+    ulimits:
+      memlock:
+        hard: -1
+        soft: -1
+      nofile:
+        hard: 65536
+        soft: 65536
+    ports:
+      - 9200:9200
+    expose:
+      - 9300
+
+  kibana:
+    build: 
+      context: ./kibana
+    depends_on:
+      - elasticsearch
+    ports:
+      - 5601:5601
+
+  logstash:
+    build:
+      context: ./logstash
+    depends_on:
+      - elasticsearch
+    ports:
+      - 9600:9600
